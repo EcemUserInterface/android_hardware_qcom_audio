@@ -2114,10 +2114,9 @@ status_t AudioPolicyManagerCustom::startInput(audio_io_handle_t input,
 
     if (!inputDesc->isActive() || mInputRoutes.hasRouteChanged(session)) {
         // if input maps to a dynamic policy with an activity listener, notify of state change
-        sp<AudioPolicyMix> policyMix = inputDesc->mPolicyMix.promote();
-        if ((policyMix != NULL)
-                && ((policyMix->mCbFlags & AudioMix::kCbFlagNotifyActivity) != 0)) {
-            mpClientInterface->onDynamicPolicyMixStateUpdate(policyMix->mDeviceAddress,
+        if ((inputDesc->mPolicyMix != NULL)
+                && ((inputDesc->mPolicyMix->mCbFlags & AudioMix::kCbFlagNotifyActivity) != 0)) {
+            mpClientInterface->onDynamicPolicyMixStateUpdate(inputDesc->mPolicyMix->mDeviceAddress,
                     MIX_STATE_MIXING);
         }
 
@@ -2136,10 +2135,10 @@ status_t AudioPolicyManagerCustom::startInput(audio_io_handle_t input,
         // For remote submix (a virtual device), we open only one input per capture request.
         if (audio_is_remote_submix_device(inputDesc->mDevice)) {
             String8 address = String8("");
-            if (policyMix == NULL) {
+            if (inputDesc->mPolicyMix == NULL) {
                 address = String8("0");
-            } else if (policyMix->mMixType == MIX_TYPE_PLAYERS) {
-                address = policyMix->mDeviceAddress;
+            } else if (inputDesc->mPolicyMix->mMixType == MIX_TYPE_PLAYERS) {
+                address = inputDesc->mPolicyMix->mDeviceAddress;
             }
             if (address != "") {
                 setDeviceConnectionStateInt(AUDIO_DEVICE_OUT_REMOTE_SUBMIX,
